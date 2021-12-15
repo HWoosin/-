@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
+#include <pthread.h>
+
+#define MAX_BUFF 100
+#define MAX_MESSAGE_LEN 256
+
+typedef struct Message 
+{
+	int u_id;
+	char str[MAX_MESSAGE_LEN];
+}Message;
+
+void *sendThreadClient();
+int sock_main;
+Message *msgbuff;
+
+void checkword(char*word,const char*find)
+{
+	int cnt, find_size;
+	char *position;
+	int cnt2=0;
+	find_size =strlen(find);
+
+	while((position =strstr(word,find)) !=NULL)
+	{
+		for(cnt=0; cnt<find_size; cnt++)
+		{
+			*(word + (strlen(word) -strlen(position)) +cnt) ='*';
+		}
+		cnt2+=1;
+	}
+	return cnt2;
+}
+
+void *sendThreadClient()
+{
+	Message tmp;
+	int count;
+	char *check[7]={"Badboy","idiot","babo","shut","fuck","kill","shit"};
+	while (1)
+	{
+		memset(&tmp, 0, sizeof(tmp));
+		fgets(tmp.str, MAX_MESSAGE_LEN, stdin);
+		tmp.str[strlen(tmp.str) - 1] = '\0';
+		tmp.u_id = -1;
+
+		for(count =0; count<7; count++)
+		{
+			checkword(tmp.str,check[count]);
+		}
+		//printf("Don't say Bad Words");
+
+		count = send(sock_main, (char *)&tmp, sizeof(Message), 0);
+	}
+}
+int main()
+{
+	int cnt;
+	int count = 0;
+	int th_id;
+	Message buff;
+	pthread_t th_send;
+
+	struct sockaddr_in addr;
+
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(36007);
+		addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+
+		if ((sock_main = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		{
+			printf("Socket Open Failed\n");
+			exit(1);
+		}
+
+		// Connect
+		if (connect(sock_main, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+		{
+			printf("Connect Failed\n");
+			exit(4);
+		}
+
+		// Client Send Thread
+		th_id = pthread_create(&th_send, NULL, sendThreadClient, 0);
+
+		if (th_id < 0)
+		{
+			printf("Send Thread Creation Failed\n");
+			exit(1);
+		}
+
+
+		while (1)
+		{
+
+
+			memset(&buff, 0, sizeof(buff));
+
+			if (recv(sock_main, (char*)&buff, sizeof(buff), 0) > 0)
+			{
+				printf("User %d: %s\n", buff.u_id, buff.str);
+			}
+			else
+			{
+				printf("Disconnected\n");
+				exit(5);
+			}
+		}
+}
