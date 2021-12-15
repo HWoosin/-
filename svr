@@ -43,7 +43,7 @@ void *sendThread()
 
 		if ((tmp = dequeue()) != NULL)
 		{
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 99; i++)
 			{
 				if (i != tmp->u_id)
 				{
@@ -180,7 +180,7 @@ int main()
 		exit(2);
 	}
 
-	
+	// listen
 	if (listen(sock_main, 5) == -1)
 	{
 		printf("Listen Failed\n");
@@ -189,7 +189,7 @@ int main()
 
 	while (1) 
 	{
-		
+		// accept and create client thread
 		if ((sock_client[count] = accept(sock_main, NULL, NULL)) == -1)
 		{
 			printf("Accept Failed\n");
