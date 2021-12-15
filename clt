@@ -44,7 +44,7 @@ void *sendThreadClient()
 {
 	Message tmp;
 	int count;
-	char *check[7]={"Badboy","idiot","babo","shut","fuck","kill","shit"};
+	char *check[7]={"suck","idiot","babo","shut","fuck","kill","shit"};
 	while (1)
 	{
 		memset(&tmp, 0, sizeof(tmp));
@@ -55,14 +55,16 @@ void *sendThreadClient()
 		for(count =0; count<7; count++)
 		{
 			checkword(tmp.str,check[count]);
+			
 		}
-		//printf("Don't say Bad Words");
+		
 
 		count = send(sock_main, (char *)&tmp, sizeof(Message), 0);
 	}
 }
 int main()
-{
+{	
+
 	int cnt;
 	int count = 0;
 	int th_id;
@@ -98,6 +100,8 @@ int main()
 			exit(1);
 		}
 
+		else
+			printf("Welcome Enjoy Open Chatting!!\n");
 
 		while (1)
 		{
