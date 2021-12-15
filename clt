@@ -18,6 +18,7 @@ typedef struct Message
 	char str[MAX_MESSAGE_LEN];
 }Message;
 
+int typecnt =0;
 void *sendThreadClient();
 int sock_main;
 Message *msgbuff;
@@ -44,6 +45,7 @@ void *sendThreadClient()
 {
 	Message tmp;
 	int count;
+	
 	char *check[7]={"suck","idiot","babo","shut","fuck","kill","shit"};
 	while (1)
 	{
@@ -58,8 +60,21 @@ void *sendThreadClient()
 			
 		}
 		
-
+		typecnt++;
 		count = send(sock_main, (char *)&tmp, sizeof(Message), 0);
+	
+		if (typecnt>2)
+		{
+			printf("Stop spamming!!\n");
+			printf("If you type more, You are Kicked.\n");
+			
+			if(typecnt>5)
+			{
+				printf("Disconnected\n");
+				exit(1);
+				
+			}
+		}
 	}
 }
 int main()
@@ -84,14 +99,14 @@ int main()
 			exit(1);
 		}
 
-		// Connect
+		
 		if (connect(sock_main, (struct sockaddr*)&addr, sizeof(addr)) == -1)
 		{
 			printf("Connect Failed\n");
 			exit(4);
 		}
 
-		// Client Send Thread
+		
 		th_id = pthread_create(&th_send, NULL, sendThreadClient, 0);
 
 		if (th_id < 0)
@@ -112,7 +127,10 @@ int main()
 			if (recv(sock_main, (char*)&buff, sizeof(buff), 0) > 0)
 			{
 				printf("User %d: %s\n", buff.u_id, buff.str);
+				typecnt=0;
 			}
+					
+				
 			else
 			{
 				printf("Disconnected\n");
