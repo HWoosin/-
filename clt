@@ -17,9 +17,10 @@ typedef struct Message
 	int u_id;
 	char str[MAX_MESSAGE_LEN];
 }Message;
-
+int close(int socket_fd);
 int typecnt =0;
 void *sendThreadClient();
+void error_handling(char* msg);
 int sock_main;
 Message *msgbuff;
 
@@ -71,12 +72,21 @@ void *sendThreadClient()
 			if(typecnt>5)
 			{
 				printf("Disconnected\n");
-				exit(1);
-				
+				close(1);
+				pause();
+					
 			}
 		}
 	}
 }
+
+void error_handling(char *msg)
+{
+    fputs(msg, stderr);
+    fputc('\n', stderr);
+    exit(1);
+}
+
 int main()
 {	
 
