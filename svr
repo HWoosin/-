@@ -20,6 +20,7 @@ typedef struct Message
 
 void *sendThread();
 void *recvThread(void *data);
+void error_handling(char* msg);
 int isFull();
 int isEmpty();
 int enqueue(Message item);
@@ -143,6 +144,14 @@ Message* dequeue()
 	}
 
 }
+
+void error_handling(char* msg)
+{
+    fputs(msg, stderr);
+    fputc('\n', stderr);
+    exit(1);
+}
+
 
 int main()
 {
